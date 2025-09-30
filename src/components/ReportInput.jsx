@@ -5,7 +5,7 @@ import { createReports } from '../services/reports'
 
 const { TextArea} = Input
 
-const ReportInput = ({ onReportAdded}) => {
+const ReportInput = ({onReportAdded}) => {
  
   const [yesterday, setYesterday] = useState("")
   const [today, setToday] = useState("")

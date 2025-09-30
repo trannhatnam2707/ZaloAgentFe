@@ -17,7 +17,12 @@ const SidebarRight = () => {
     try {
         setLoading(true)
         const res = await askAgent(question)
-        setAnswer(res.answer);
+
+        // Lấy đoạn sau "Final answer:"
+        const match = res.answer.split("Final answer:");
+        const finalAnswer = match.length > 1 ? match[1].trim() : res.answer;
+
+        setAnswer(finalAnswer);
         setQuestion("")
     }
     catch (err) {
