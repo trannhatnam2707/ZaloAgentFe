@@ -44,46 +44,34 @@ const ReportList = () => {
   // Gửi update lên server
   const handleUpdate = async () => {
     try {
-      if (!editToday) {
-        message.error("Vui lòng nhập task hôm nay!");
+      if (!editToday || !editYesterday || !editDate) {
+        message.error("Vui lòng điền đầy đủ thông tin!");
         return;
       }
-      if (!editYesterday){
-        message.error("Vui lòng nhập task hôm qua!");
+  
+      const username = localStorage.getItem("username");
+      if (!username) {
+        message.error("Không tìm thấy username");
         return;
       }
-      if (!editDate) {
-        message.error("Vui lòng chọn ngày!");
-        return;
-      }
-
+  
       const updated = await updateReport(editingReport.id, {
+        user_name: username,  // Thêm user_name (vì BE dùng ReportCreate)
+        date: editDate.format("YYYY-MM-DD"),
         yesterday: editYesterday,
-        today: editToday,
-        date: editDate.format("YYYY-MM-DD"), // format theo chuẩn BE
+        today: editToday
       });
-
+  
       message.success("Cập nhật report thành công");
-
-      // cập nhật trong list
       setReports((prev) =>
         prev.map((r) => (r.id === updated.id ? updated : r))
       );
-
       setEditingReport(null);
     } catch (err) {
       console.error("Lỗi khi update:", err);
-      message.error("Không thể cập nhật report");
+      message.error(err.response?.data?.detail || "Không thể cập nhật report");
     }
   };
-
-  if (loading) {
-    return (
-      <div style={{ textAlign: "center", padding: "20px" }}>
-        <Spin />
-      </div>
-    );
-  }
 
   return (
     <div

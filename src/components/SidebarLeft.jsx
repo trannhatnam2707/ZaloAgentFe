@@ -11,15 +11,23 @@ const SidebarLeft = () => {
 
   const handleLogout = async () => {
     try {
+      const userId = localStorage.getItem("user_id");
+      
       if (userId) {
-        await logout(userId); // gọi API logout
+        await logout(userId); // Thử gọi API
       }
-      localStorage.clear(); // xoá hết localStorage
-      message.success("Đăng xuất thành công")
-      navigate("/users/login"); // quay về trang login
+      
+      // Dù API thành công hay thất bại, vẫn logout ở FE
+      localStorage.clear();
+      message.success("Đăng xuất thành công");
+      navigate("/login");
     } catch (err) {
-        console.error(err);
-        message.error("Đăng xuất thất bại!");
+      console.error("Logout error:", err);
+      
+      // Vẫn clear localStorage và redirect dù có lỗi
+      localStorage.clear();
+      message.info("Đã đăng xuất");
+      navigate("/login");
     }
   };
 

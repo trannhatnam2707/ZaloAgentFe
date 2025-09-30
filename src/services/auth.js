@@ -8,14 +8,15 @@ export const register = async(username, password) => {
 export const login = async(username, password) => {
     const res = await api.post("/users/login", { username, password });
 
-    localStorage.setItem("user_id", id);
-    localStorage.setItem("username", username);
+    // Lưu user_id và username vào localStorage từ response
+    localStorage.setItem("user_id", res.data.id);
+    localStorage.setItem("username", res.data.username);
 
     return res.data; // { id, username }
 };
 
 export const logout = async (userId) => {
-    const res = await api.post("/users/logout", { user_id: userId });
+    const res = await api.post(`/users/logout/${userId}`);
     return res.data;
 };
 

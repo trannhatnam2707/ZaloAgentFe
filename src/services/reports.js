@@ -11,6 +11,6 @@ export const createReports = async(reportData) => {
 }
     
 export const updateReport = async(reportId, updateData) => {
-    const res = await api.put(`/report/${reportId}`, updateData)
+    const res = await api.put(`/reports/${reportId}`, updateData)
     return res.data
 }

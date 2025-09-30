@@ -14,12 +14,10 @@ const LoginPage = () => {
         setLoading(true)
         const res = await login(values.username, values.password)
 
-        // Lưu user_id và username vào localStorage
-        localStorage.setItem("user_id", res.id);
-        localStorage.setItem("username", res.username);
-
         message.success("Đăng nhập thành công")
-        navigate("/")
+        
+        // Force reload để App.jsx re-check authentication
+        window.location.href = "/"
     }
     catch (err)
     {

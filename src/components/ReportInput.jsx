@@ -13,46 +13,45 @@ const ReportInput = ({ onReportAdded}) => {
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async() => {
-    if(!today)
-    {
-        message.error("Vui lòng nhập task hôm nay!")
-        return
+  if(!today) {
+    message.error("Vui lòng nhập task hôm nay!");
+    return;
+  }
+
+  try {
+    setLoading(true);
+    const username = localStorage.getItem("username"); // ← Lấy username thay vì user_id
+    
+    if(!username) {
+      message.error("Không tìm thấy username. Vui lòng đăng nhập lại");
+      return;
     }
 
-    try{
-        setLoading(true)
-        const user_id = localStorage.getItem("user_id") // lấy từ localStorage lúc login
-        if(!user_id){
-            message.error("Không tìm thấy user_id. Vui lòng đăng nhập lại")
-            return
-        }
+    const reportData = {
+      user_name: username,  // ← Đổi từ user_id sang user_name
+      date: date.format("YYYY-MM-DD"),
+      yesterday: yesterday || "",
+      today: today
+    };
 
-        const reportData = {
-            user_id,
-            date: date.format("YYYY-MM-DD"), // format chuẩn theo Mongo
-            yesterday,
-            today
-        }
+    const res = await createReports(reportData);
+    message.success("Gửi report thành công");
+    
+    setYesterday("");
+    setToday("");
+    setDate(dayjs());
 
-        const res = await createReports(reportData)
-        message.success("Gửi report thành công")
-
-        //reset Input
-        setYesterday("")
-        setToday("")
-        setDate(dayjs());
-
-        if(onReportAdded) {
-            onReportAdded(res) //// callback cho MainPage cập nhật list
-        }
+    if(onReportAdded) {
+      onReportAdded(res);
     }
-    catch (err) {
-        console.error(" Lỗi khi gửi report: ", err)
-        message.error("Không thể gửi report")
-    }
-    finally {
-        setLoading(false)
-    }
+  }
+  catch (err) {
+    console.error("Lỗi khi gửi report:", err);
+    message.error(err.response?.data?.detail || "Không thể gửi report");
+  }
+  finally {
+    setLoading(false);
+  }
 }
 
   return (
