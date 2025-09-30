@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import { Card, Input, Button, message, Modal, Spin, DatePicker } from "antd";
 import dayjs from "dayjs";
 import { getReports, updateReport } from "../services/reports";
 
 const { TextArea } = Input;
 
-const ReportList = () => {
+const ReportList = forwardRef((props, ref) => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingReport, setEditingReport] = useState(null);
@@ -33,12 +33,19 @@ const ReportList = () => {
     fetchReports();
   }, []);
 
+  // Expose function để MainPage có thể gọi
+  useImperativeHandle(ref, () => ({
+    addNewReport: (newReport) => {
+      setReports(prev => [...prev, newReport]);
+    }
+  }));
+
   // Khi click vào report của chính mình để update
   const handleEdit = (report) => {
     setEditingReport(report);
     setEditYesterday(report.yesterday);
     setEditToday(report.today);
-    setEditDate(dayjs(report.date)); // convert string -> dayjs
+    setEditDate(dayjs(report.date));
   };
 
   // Gửi update lên server
@@ -56,7 +63,7 @@ const ReportList = () => {
       }
   
       const updated = await updateReport(editingReport.id, {
-        user_name: username,  // Thêm user_name (vì BE dùng ReportCreate)
+        user_name: username,
         date: editDate.format("YYYY-MM-DD"),
         yesterday: editYesterday,
         today: editToday
@@ -73,10 +80,18 @@ const ReportList = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        <Spin />
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
-        height: "70vh",
+        height: "100%",
         overflowY: "auto",
         padding: "10px",
         background: "#f5f5f5",
@@ -150,6 +165,6 @@ const ReportList = () => {
       </Modal>
     </div>
   );
-};
+});
 
 export default ReportList;

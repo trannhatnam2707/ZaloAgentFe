@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Layout } from "antd";
 import ReportInput from "../components/ReportInput";
 import ReportList from "../components/ReportList";
@@ -8,6 +8,14 @@ import SidebarRight from "../components/SidebarRight";
 const { Sider, Content } = Layout;
 
 const MainPage = () => {
+  const reportListRef = useRef(null);
+
+  const handleReportAdded = (newReport) => {
+    if (reportListRef.current) {
+      reportListRef.current.addNewReport(newReport);
+    }
+  };
+
   return (
     <Layout 
       style={{ 
@@ -19,7 +27,6 @@ const MainPage = () => {
         overflow: "hidden"
       }}
     >
-      {/* Sidebar trái: Logout */}
       <Sider 
         width={200} 
         style={{ 
@@ -31,7 +38,6 @@ const MainPage = () => {
         <SidebarLeft />
       </Sider>
 
-      {/* Content chính */}
       <Layout style={{ flex: 1 }}>
         <Content 
           style={{ 
@@ -39,20 +45,20 @@ const MainPage = () => {
             display: "flex", 
             flexDirection: "column",
             gap: "20px",
-            overflow: "auto",
-            background: "#f5f5f5"
+            overflow: "hidden",
+            background: "#f5f5f5",
+            height: "100%"
           }}
         >
-          <div style={{ flex: 1, overflow: "auto" }}>
-            <ReportList />
+          <div style={{ flex: 1, minHeight: 0 }}>
+            <ReportList ref={reportListRef} />
           </div>
           <div style={{ flex: "0 0 auto" }}>
-            <ReportInput />
+            <ReportInput onReportAdded={handleReportAdded} />
           </div>
         </Content>
       </Layout>
 
-      {/* Sidebar phải: Ô hỏi sếp */}
       <Sider 
         width={300} 
         style={{ 
