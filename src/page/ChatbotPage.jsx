@@ -16,9 +16,9 @@ const ChatBotPage = () => {
       setLoading(true);
       const res = await askAgent(question);
 
-      // Lấy đoạn sau "Final answer:"
       const match = res.answer.split("Final answer:");
       const finalAnswer = match.length > 1 ? match[1].trim() : res.answer;
+
 
       setAnswer(finalAnswer);
       setQuestion("");

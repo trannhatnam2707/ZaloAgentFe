@@ -10,7 +10,7 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 
 const HeaderBar = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const username = localStorage.getItem("username");
 
   const handleLogout = async () => {
@@ -63,7 +63,7 @@ const HeaderBar = () => {
         flexShrink: 0, // Không cho logo bị co lại
         minWidth: "120px"
       }}>
-        ZaloAgentFE
+        ReportDaily
       </div>
 
       {/* Navigation + User */}
@@ -95,7 +95,7 @@ const HeaderBar = () => {
                 fontSize: "14px", // Giảm font size
               }}
             >
-              <span style={{ display: "none" }}>Trang chính</span>
+              <span >Trang chính</span>
             </Button>
           )}
         </NavLink>
@@ -119,7 +119,7 @@ const HeaderBar = () => {
                 fontSize: "14px", // Giảm font size
               }}
             >
-              <span style={{ display: "none" }}>Chatbox</span>
+              <span>Chatbox</span>
             </Button>
           )}
         </NavLink>
