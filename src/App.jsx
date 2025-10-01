@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./page/LoginPage";
 import RegisterPage from "./page/RegisterPage";
 import MainPage from "./page/MainPage";
+import ChatBotPage from "./page/ChatbotPage"; // 👈 import thêm ChatBotPage
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -23,14 +24,14 @@ function App() {
       checkAuth();
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    
+    window.addEventListener("storage", handleStorageChange);
+
     // Also check on focus (when user comes back to tab)
-    window.addEventListener('focus', checkAuth);
+    window.addEventListener("focus", checkAuth);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('focus', checkAuth);
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("focus", checkAuth);
     };
   }, []);
 
@@ -42,7 +43,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Nếu đã login thì chuyển sang / */}
+        {/* Login + Register */}
         <Route
           path="/login"
           element={isAuthenticated ? <Navigate to="/" /> : <LoginPage />}
@@ -52,13 +53,19 @@ function App() {
           element={isAuthenticated ? <Navigate to="/" /> : <RegisterPage />}
         />
 
-        {/* MainPage - bắt buộc phải login mới vào được */}
+        {/* MainPage */}
         <Route
           path="/"
           element={isAuthenticated ? <MainPage /> : <Navigate to="/login" />}
         />
 
-        {/* Catch all route */}
+        {/* ChatBotPage (cũng yêu cầu login) */}
+        <Route
+          path="/ChatBotPage"
+          element={isAuthenticated ? <ChatBotPage /> : <Navigate to="/login" />}
+        />
+
+        {/* Catch all */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
