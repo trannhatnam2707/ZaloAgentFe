@@ -15,7 +15,9 @@ const ChatBotPage = () => {
     try {
       setLoading(true);
       const res = await askAgent(question);
+      console.log(res);
 
+      // Lấy câu trả lời từ response (chỉ lấy phần sau Final answer:)
       const match = res.answer.split("Final answer:");
       const finalAnswer = match.length > 1 ? match[1].trim() : res.answer;
 
@@ -96,20 +98,20 @@ const ChatBotPage = () => {
         </div>
 
         {/* Input + nút gửi */}
-        <div style={{ width: "100%", boxSizing: "border-box" }}>
+        <div style={{ width: "100%", boxSizing: "border-box", display: "flex", gap: "8px"}}>
           <Input.TextArea
             placeholder="Nhập câu hỏi của bạn..."
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyPress={handleKeyPress}
-            rows={3}
-            style={{ resize: "none", width: "100%" }}
+            rows={2}
+            style={{ resize: "none", width: "95%" }}
           />
           <Button
             type="primary"
             onClick={handleAsk}
             loading={loading}
-            style={{ marginTop: "8px", width: "100%" }}
+            style={{ width: "5%" , height: "50px"}}
             disabled={!question.trim()}
           >
             Gửi

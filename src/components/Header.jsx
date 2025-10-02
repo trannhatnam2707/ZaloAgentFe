@@ -1,17 +1,17 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Dropdown, Menu, Button } from "antd";
 import {
   DownOutlined,
   LogoutOutlined,
-  HomeOutlined,
-  MessageOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 const HeaderBar = () => {
-  // const navigate = useNavigate();
   const username = localStorage.getItem("username");
+  const location = useLocation();
+  const navRefs = useRef({});
+  const [indicatorStyle, setIndicatorStyle] = useState({});
 
   const handleLogout = async () => {
     try {
@@ -36,6 +36,17 @@ const HeaderBar = () => {
     </Menu>
   );
 
+  // Cập nhật vị trí line highlight khi đổi route
+  useEffect(() => {
+    const current = navRefs.current[location.pathname];
+    if (current) {
+      setIndicatorStyle({
+        left: current.offsetLeft,
+        width: current.offsetWidth,
+      });
+    }
+  }, [location.pathname]);
+
   return (
     <div
       style={{
@@ -46,111 +57,91 @@ const HeaderBar = () => {
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0 20px",
-        background: "#fafafa",
+        background: "#3366FF", // xanh kiểu Zalo
         position: "fixed",
         top: 0,
         left: 0,
         right: 0,
         zIndex: 1000,
         boxSizing: "border-box",
-        minWidth: "320px", // Đảm bảo header không bị quá nhỏ
+        minWidth: "320px",
+        fontFamily: `"Segoe UI", Roboto, Helvetica, Arial, sans-serif`, // ép chung font
       }}
     >
-      {/* Logo */}
-      <div style={{ 
-        fontSize: "18px", 
-        fontWeight: "bold",
-        flexShrink: 0, // Không cho logo bị co lại
-        minWidth: "120px"
-      }}>
-        ReportDaily
-      </div>
+      {/* Navigation */}
+      <div style={{ position: "relative", display: "flex", gap: "30px" }}>
+        {/* Thanh highlight */}
+        <span
+          style={{
+            position: "absolute",
+            bottom: "-2px",
+            height: "3px",
+            background: "#fff",
+            borderRadius: "2px",
+            transition: "all 0.3s ease",
+            ...indicatorStyle,
+          }}
+        />
 
-      {/* Navigation + User */}
-      <div style={{ 
-        display: "flex", 
-        alignItems: "center", 
-        gap: "12px", // Giảm gap để tiết kiệm không gian
-        flexShrink: 1, // Cho phép co lại khi cần
-        minWidth: 0, // Cho phép flex item co lại
-        overflow: "hidden" // Ẩn nội dung bị overflow
-      }}>
-        {/* Điều hướng */}
         <NavLink
           to="/"
+          ref={(el) => (navRefs.current["/"] = el)}
           style={({ isActive }) => ({
             textDecoration: "none",
-            flexShrink: 0, // Không cho button bị co lại
+            fontSize: "16px",
+            fontWeight: isActive ? "bold" : "normal",
+            color: "#fff",
+            padding: "6px 0",
           })}
         >
-          {({ isActive }) => (
-            <Button
-              type="text"
-              icon={<HomeOutlined />}
-              style={{
-                color: isActive ? "#1677ff" : "inherit",
-                fontWeight: isActive ? "bold" : "normal",
-                padding: "4px 8px", // Giảm padding
-                height: "32px", // Giảm height
-                fontSize: "14px", // Giảm font size
-              }}
-            >
-              <span >Trang chính</span>
-            </Button>
-          )}
+          Trang chính
         </NavLink>
 
         <NavLink
           to="/ChatBotPage"
+          ref={(el) => (navRefs.current["/ChatBotPage"] = el)}
           style={({ isActive }) => ({
             textDecoration: "none",
-            flexShrink: 0, // Không cho button bị co lại
+            fontSize: "16px",
+            fontWeight: isActive ? "bold" : "normal",
+            color: "#fff",
+            padding: "6px 0",
           })}
         >
-          {({ isActive }) => (
-            <Button
-              type="text"
-              icon={<MessageOutlined />}
-              style={{
-                color: isActive ? "#1677ff" : "inherit",
-                fontWeight: isActive ? "bold" : "normal",
-                padding: "4px 8px", // Giảm padding
-                height: "32px", // Giảm height
-                fontSize: "14px", // Giảm font size
-              }}
-            >
-              <span>Chatbox</span>
-            </Button>
-          )}
+          Chatbox
         </NavLink>
+      </div>
 
-        {/* User dropdown */}
-        <Dropdown overlay={userMenu} trigger={["click"]}>
-          <Button 
-            type="text" 
-            icon={<UserOutlined />}
+      {/* User dropdown */}
+      <Dropdown overlay={userMenu} trigger={["click"]}>
+        <Button
+          type="text"
+          icon={<UserOutlined />}
+          style={{
+            padding: "4px 8px",
+            height: "32px",
+            fontSize: "14px",
+            flexShrink: 0,
+            minWidth: "auto",
+            color: "#fff",
+          }}
+        >
+          <span
             style={{
-              padding: "4px 8px",
-              height: "32px",
-              fontSize: "14px",
-              flexShrink: 0, // Không cho user button bị co lại
-              minWidth: "auto",
+              maxWidth: "100px",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              color: "#fff",
             }}
           >
-            <span style={{ 
-              maxWidth: "100px", 
-              overflow: "hidden", 
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap"
-            }}>
-              {username || "User"}
-            </span>
-            <DownOutlined style={{ marginLeft: "4px" }} />
-          </Button>
-        </Dropdown>
-      </div>
+            {username || "User"}
+          </span>
+          <DownOutlined style={{ marginLeft: "4px", color: "#fff" }} />
+        </Button>
+      </Dropdown>
     </div>
   );
 };
 
-export default HeaderBar
+export default HeaderBar;
