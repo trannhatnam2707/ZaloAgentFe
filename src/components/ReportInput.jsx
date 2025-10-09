@@ -17,28 +17,31 @@ const ReportInput = ({ onReportAdded }) => {
       return;
     }
 
+    // ✅ Lưu giá trị trước khi xóa
+    const reportData = {
+      user_name: localStorage.getItem("username"),
+      date: date.format("YYYY-MM-DD"),
+      yesterday: yesterday || "",
+      today: today
+    };
+
+    // ✅ Xóa input NGAY LẬP TỨC khi nhấn Send
+    setYesterday("");
+    setToday("");
+    setDate(dayjs());
+
     try {
       setLoading(true);
-      const username = localStorage.getItem("username"); // ← Lấy username thay vì user_id
-
+      
+      const username = localStorage.getItem("username");
+      
       if (!username) {
         message.error("Không tìm thấy username. Vui lòng đăng nhập lại");
         return;
       }
 
-      const reportData = {
-        user_name: username,  // ← Đổi từ user_id sang user_name
-        date: date.format("YYYY-MM-DD"),
-        yesterday: yesterday || "",
-        today: today
-      };
-
       const res = await createReports(reportData);
       message.success("Gửi report thành công");
-
-      setYesterday("");
-      setToday("");
-      setDate(dayjs());
 
       if (onReportAdded) {
         onReportAdded(res);
@@ -47,6 +50,11 @@ const ReportInput = ({ onReportAdded }) => {
     catch (err) {
       console.error("Lỗi khi gửi report:", err);
       message.error(err.response?.data?.detail || "Không thể gửi report");
+      
+      // ❌ Nếu lỗi thì restore lại giá trị
+      setYesterday(reportData.yesterday);
+      setToday(reportData.today);
+      setDate(dayjs(reportData.date));
     }
     finally {
       setLoading(false);
@@ -72,27 +80,30 @@ const ReportInput = ({ onReportAdded }) => {
           placeholder="Hôm qua bạn làm gì ?"
           value={yesterday}
           onChange={(e) => setYesterday(e.target.value)}
+          disabled={loading}
         />
         <DatePicker
           value={date}
           onChange={(val) => setDate(val)}
           format="YYYY-MM-DD"
           style={{ width: "140px" }}
+          disabled={loading}
         />
       </div>
 
-      {/* Hàng 2: Send + Hôm nay */}
+      {/* Hàng 2: Hôm nay + Send */}
       <div style={{ display: "flex", gap: "8px" }}>
-      <TextArea
+        <TextArea
           rows={2}
           placeholder="Hôm nay bạn làm gì ?"
           value={today}
           onChange={(e) => setToday(e.target.value)}
+          disabled={loading}
         />
         <Button
           type="primary"
           onClick={handleSubmit}
-          disabled={loading} // chỉ nhạt màu thay vì loading xoay
+          loading={loading}
           style={{
             width: "140px",
             fontSize: "16px",

@@ -1,30 +1,49 @@
-import { Button, Input, Typography } from "antd";
-import React, { useState } from "react";
+import { Button, Input, Spin } from "antd";
+import React, { useState, useRef, useEffect } from "react";
 import { askAgent } from "../services/ask";
 import HeaderBar from "../components/Header";
-
-const { Text } = Typography;
+import { SendOutlined } from "@ant-design/icons";
 
 const ChatBotPage = () => {
   const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
+  const [messages, setMessages] = useState([]); // Lưu lịch sử chat
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  // Auto scroll xuống tin nhắn mới nhất
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleAsk = async () => {
     if (!question.trim()) return;
-    
+
+    const username = localStorage.getItem("username");
+    if (!username) {
+      setMessages(prev => [...prev, {
+        type: "error",
+        content: "❌ Không tìm thấy thông tin đăng nhập. Vui lòng đăng nhập lại.",
+        timestamp: new Date()
+      }]);
+      return;
+    }
+
+    // Thêm câu hỏi của user vào chat
+    const userMessage = {
+      type: "user",
+      content: question,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, userMessage]);
+    setQuestion(""); // Xóa input ngay sau khi gửi
+
     try {
       setLoading(true);
       
-      // ✅ Lấy username từ localStorage
-      const username = localStorage.getItem("username");
-      
-      if (!username) {
-        setAnswer("❌ Không tìm thấy thông tin đăng nhập. Vui lòng đăng nhập lại.");
-        return;
-      }
-      
-      // ✅ Gửi kèm username
       const res = await askAgent(question, username);
       console.log(res);
 
@@ -32,11 +51,23 @@ const ChatBotPage = () => {
       const match = res.answer.split("Final answer:");
       const finalAnswer = match.length > 1 ? match[1].trim() : res.answer;
 
-      setAnswer(finalAnswer);
-      setQuestion("");
+      // Thêm câu trả lời của bot vào chat
+      const botMessage = {
+        type: "bot",
+        content: finalAnswer,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMessage]);
     } catch (err) {
       console.error("Error asking:", err);
-      setAnswer("Không thể lấy câu trả lời!");
+      
+      // Thêm thông báo lỗi vào chat
+      const errorMessage = {
+        type: "error",
+        content: "❌ Không thể lấy câu trả lời! Vui lòng thử lại.",
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setLoading(false);
     }
@@ -59,6 +90,7 @@ const ChatBotPage = () => {
         margin: 0,
         padding: 0,
         boxSizing: "border-box",
+        background: "#f5f5f5",
       }}
     >
       <HeaderBar />
@@ -67,60 +99,192 @@ const ChatBotPage = () => {
         style={{
           flex: 1,
           marginTop: "60px",
-          padding: "20px",
           display: "flex",
           flexDirection: "column",
           background: "#fff",
           width: "100%",
+          maxWidth: "1200px",
+          margin: "60px auto 0 auto",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           boxSizing: "border-box",
         }}
       >
-        {/* Khung hiển thị câu trả lời */}
+        {/* Khung hiển thị chat */}
         <div
           style={{
             flex: 1,
+            overflowY: "auto",
+            padding: "20px",
             display: "flex",
             flexDirection: "column",
-            overflowY: "auto",
-            border: "1px solid #d9d9d9",
-            borderRadius: "6px",
-            padding: "12px",
-            marginBottom: "15px",
+            gap: "12px",
             background: "#fafafa",
-            width: "100%",
-            boxSizing: "border-box",
           }}
         >
-          <Text strong style={{ marginBottom: "10px", display: "block" }}>
-            Câu trả lời:
-          </Text>
-          {answer ? (
-            <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-              {answer}
+          {messages.length === 0 ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+                color: "#999",
+                fontSize: "16px",
+              }}
+            >
+              👋 Xin chào! Hãy đặt câu hỏi để bắt đầu trò chuyện...
             </div>
           ) : (
-            <Text type="secondary" style={{ fontStyle: "italic" }}>
-              Chưa có câu trả lời...
-            </Text>
+            messages.map((msg, index) => (
+              <div
+                key={index}
+                style={{
+                  display: "flex",
+                  justifyContent: msg.type === "user" ? "flex-end" : "flex-start",
+                  alignItems: "flex-start",
+                  marginBottom: "8px",
+                }}
+              >
+                {msg.type === "bot" && (
+                  <div
+                    style={{
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "50%",
+                      background: "#1677ff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      marginRight: "8px",
+                      flexShrink: 0,
+                    }}
+                  >
+                    AI
+                  </div>
+                )}
+
+                <div
+                  style={{
+                    maxWidth: "70%",
+                    padding: "12px 16px",
+                    borderRadius: "12px",
+                    background: msg.type === "user" 
+                      ? "#1677ff" 
+                      : msg.type === "error" 
+                      ? "#ff4d4f" 
+                      : "#fff",
+                    color: msg.type === "user" || msg.type === "error" ? "#fff" : "#000",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                    wordBreak: "break-word",
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {msg.content}
+                </div>
+
+                {msg.type === "user" && (
+                  <div
+                    style={{
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "50%",
+                      background: "#52c41a",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      marginLeft: "8px",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {localStorage.getItem("username")?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                )}
+              </div>
+            ))
           )}
+
+          {/* Hiển thị loading khi đang chờ bot trả lời */}
+          {loading && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <div
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "50%",
+                  background: "#1677ff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontWeight: "bold",
+                }}
+              >
+                AI
+              </div>
+              <div
+                style={{
+                  padding: "12px 16px",
+                  borderRadius: "12px",
+                  background: "#fff",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                }}
+              >
+                <Spin size="small" />
+                <span style={{ marginLeft: "8px" }}>Đang suy nghĩ...</span>
+              </div>
+            </div>
+          )}
+
+          {/* Scroll anchor */}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input + nút gửi */}
-        <div style={{ width: "100%", boxSizing: "border-box", display: "flex", gap: "8px"}}>
+        <div
+          style={{
+            padding: "16px 20px",
+            borderTop: "1px solid #f0f0f0",
+            background: "#fff",
+            display: "flex",
+            gap: "12px",
+            alignItems: "flex-end",
+          }}
+        >
           <Input.TextArea
             placeholder="Nhập câu hỏi của bạn..."
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyPress={handleKeyPress}
             rows={2}
-            style={{ resize: "none", width: "95%" }}
+            style={{
+              resize: "none",
+              flex: 1,
+              borderRadius: "8px",
+            }}
+            disabled={loading}
           />
           <Button
             type="primary"
             onClick={handleAsk}
             loading={loading}
-            style={{ width: "5%" , height: "50px"}}
-            disabled={!question.trim()}
+            icon={<SendOutlined />}
+            style={{
+              height: "50px",
+              width: "80px",
+              borderRadius: "8px",
+            }}
+            disabled={!question.trim() || loading}
           >
             Gửi
           </Button>
