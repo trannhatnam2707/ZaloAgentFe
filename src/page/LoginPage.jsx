@@ -18,6 +18,7 @@ const LoginPage = () => {
         
         // Force reload để App.jsx re-check authentication
         window.location.href = "/"
+        
     }
     catch (err)
     {

@@ -1,7 +1,7 @@
 import { Button, Input, Typography } from "antd";
 import React, { useState } from "react";
 import { askAgent } from "../services/ask";
-import HeaderBar from "../components/Header"; // import header
+import HeaderBar from "../components/Header";
 
 const { Text } = Typography;
 
@@ -12,15 +12,25 @@ const ChatBotPage = () => {
 
   const handleAsk = async () => {
     if (!question.trim()) return;
+    
     try {
       setLoading(true);
-      const res = await askAgent(question);
+      
+      // ✅ Lấy username từ localStorage
+      const username = localStorage.getItem("username");
+      
+      if (!username) {
+        setAnswer("❌ Không tìm thấy thông tin đăng nhập. Vui lòng đăng nhập lại.");
+        return;
+      }
+      
+      // ✅ Gửi kèm username
+      const res = await askAgent(question, username);
       console.log(res);
 
-      // Lấy câu trả lời từ response (chỉ lấy phần sau Final answer:)
+      // Lấy câu trả lời từ response
       const match = res.answer.split("Final answer:");
       const finalAnswer = match.length > 1 ? match[1].trim() : res.answer;
-
 
       setAnswer(finalAnswer);
       setQuestion("");
@@ -43,7 +53,7 @@ const ChatBotPage = () => {
     <div
       style={{
         height: "100vh",
-        width: "100vw", // full màn hình ngang
+        width: "100vw",
         display: "flex",
         flexDirection: "column",
         margin: 0,
@@ -51,14 +61,12 @@ const ChatBotPage = () => {
         boxSizing: "border-box",
       }}
     >
-      {/* Header cố định trên cùng */}
       <HeaderBar />
 
-      {/* Nội dung chat */}
       <div
         style={{
           flex: 1,
-          marginTop: "60px", // chừa chỗ cho header
+          marginTop: "60px",
           padding: "20px",
           display: "flex",
           flexDirection: "column",
