@@ -1,16 +1,26 @@
 import { Button, Input, Spin } from "antd";
 import React, { useState, useRef, useEffect } from "react";
-import { askAgent } from "../services/ask";
+import { askAgent, clearChatHistory } from "../services/ask";
 import HeaderBar from "../components/Header";
 import { SendOutlined } from "@ant-design/icons";
 
 const ChatBotPage = () => {
   const [question, setQuestion] = useState("");
-  const [messages, setMessages] = useState([]); // Lưu lịch sử chat
+  const [messages, setMessages] = useState([]); // Không load từ đâu cả
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Auto scroll xuống tin nhắn mới nhất
+  // Xóa lịch sử backend khi component mount (reload trang)
+  useEffect(() => {
+    const username = localStorage.getItem("username");
+    if (username) {
+      // Xóa session backend khi reload trang
+      clearChatHistory(username).catch(err => {
+        console.error("Error clearing backend history:", err);
+      });
+    }
+  }, []); // Chỉ chạy 1 lần khi mount
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -26,7 +36,7 @@ const ChatBotPage = () => {
     if (!username) {
       setMessages(prev => [...prev, {
         type: "error",
-        content: "❌ Không tìm thấy thông tin đăng nhập. Vui lòng đăng nhập lại.",
+        content: "⚠ Không tìm thấy thông tin đăng nhập. Vui lòng đăng nhập lại.",
         timestamp: new Date()
       }]);
       return;
@@ -64,7 +74,7 @@ const ChatBotPage = () => {
       // Thêm thông báo lỗi vào chat
       const errorMessage = {
         type: "error",
-        content: "❌ Không thể lấy câu trả lời! Vui lòng thử lại.",
+        content: "⚠ Không thể lấy câu trả lời! Vui lòng thử lại.",
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -91,6 +101,7 @@ const ChatBotPage = () => {
         padding: 0,
         boxSizing: "border-box",
         background: "#f5f5f5",
+        overflow: "hidden", // ← FIX 1: Ngăn scroll toàn trang
       }}
     >
       <HeaderBar />
@@ -98,7 +109,6 @@ const ChatBotPage = () => {
       <div
         style={{
           flex: 1,
-          marginTop: "60px",
           display: "flex",
           flexDirection: "column",
           background: "#fff",
@@ -107,6 +117,7 @@ const ChatBotPage = () => {
           margin: "60px auto 0 auto",
           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           boxSizing: "border-box",
+          overflow: "hidden", // ← FIX 1: Ngăn scroll container
         }}
       >
         {/* Khung hiển thị chat */}
@@ -114,6 +125,7 @@ const ChatBotPage = () => {
           style={{
             flex: 1,
             overflowY: "auto",
+            overflowX: "hidden", // ← FIX 2: Ngăn scroll ngang
             padding: "20px",
             display: "flex",
             flexDirection: "column",

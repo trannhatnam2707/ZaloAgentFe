@@ -108,7 +108,7 @@ const HeaderBar = () => {
             padding: "6px 0",
           })}
         >
-          Chatbox
+          Chatbot
         </NavLink>
       </div>
 
