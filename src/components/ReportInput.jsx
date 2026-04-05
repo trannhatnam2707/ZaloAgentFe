@@ -17,7 +17,7 @@ const ReportInput = ({ onReportAdded }) => {
       return;
     }
 
-    // ✅ Lưu giá trị trước khi xóa
+    //  Lưu giá trị trước khi xóa
     const reportData = {
       user_name: localStorage.getItem("username"),
       date: date.format("YYYY-MM-DD"),
@@ -25,7 +25,7 @@ const ReportInput = ({ onReportAdded }) => {
       today: today
     };
 
-    // ✅ Xóa input NGAY LẬP TỨC khi nhấn Send
+    // Xóa input NGAY LẬP TỨC khi nhấn Send
     setYesterday("");
     setToday("");
     setDate(dayjs());
