@@ -1,92 +1,75 @@
-import { Card, Form, Input, Button, message, Typography } from 'antd'
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { login } from '../services/auth'
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Form, message } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons'; // Thêm icon cho đẹp
 
-const { Title } = Typography
+import { useLogin } from '../../Hooks/useLogin'; // Dùng chuẩn file hook bạn vừa viết
+import AuthLayout from '../components/layout/AuthLayout';
+import FormInput from '../components/ui/FormInput';
+import Button from '../components/ui/Button'
 
 const LoginPage = () => {
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
+    const { executeLogin, isLoading, error } = useLogin();
+    
+    // Đồ nghề hiện thông báo (Toast) cực xịn của thư viện
+    const [messageApi, contextHolder] = message.useMessage();
 
-  const onFinish = async (values) => {
-    try{
-        setLoading(true)
-        const res = await login(values.username, values.password)
+    // Lắng nghe: Cứ khi nào hook báo có lỗi -> Bắn popup lỗi ra góc trên màn hình
+    useEffect(() => {
+        if (error) {
+            messageApi.error(error);
+        }
+    }, [error, messageApi]);
 
-        message.success("Đăng nhập thành công")
-        
-        // Force reload để App.jsx re-check authentication
-        window.location.href = "/"
-        
-    }
-    catch (err)
-    {
-        console.error("Login error: ", err)
-        message.error(err?.response?.data?.detail || "Sai tài khoản hoặc mật khẩu")
-    }
-    finally {
-        setLoading(false)
-    }
-  }
+    // Hàm này CHỈ CHẠY khi user đã điền đầy đủ dữ liệu không vi phạm rules
+    const onFinish = (values) => {
+        // values lúc này là 1 object có sẵn: { username: "...", password: "..." }
+        executeLogin(values.username, values.password);
+    };
 
-  return (
-    <div
-        style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            background: "linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%)",
-            margin: 0,
-            padding: 0
-        }}
-    >
-        <Card 
-            style={{ 
-                width: 400, 
-                padding: 20, 
-                borderRadius: 12,
-                boxShadow: "0 8px 16px rgba(0,0,0,0.1)"
-            }}
-        >
-            <Title level={3} style={{ textAlign: "center", marginBottom: "20px" }}>
-                Đăng Nhập
-            </Title>
-            <Form layout="vertical" onFinish={onFinish}>
-                <Form.Item
-                    label="Tên đăng nhập"
-                    name="username"
-                    rules={[{ required: true, message: "Vui lòng nhập username" }]}
-                >
-                    <Input />
+    return (
+        <AuthLayout title="Zalo Clone" subtitle="Đăng nhập để kết nối với bạn bè">
+            {contextHolder} {/* Khai báo để thư viện biết chỗ vẽ popup lỗi */}
+
+            <Form
+                name="login_form"
+                layout="vertical"
+                onFinish={onFinish}
+                requiredMark={false} // Tắt dấu sao đỏ xấu xí mặc định
+            >
+                <FormInput 
+                    label="Tài khoản" 
+                    name="username" 
+                    prefix={<UserOutlined className="text-gray-400" />}
+                    placeholder="Nhập username" 
+                    rules={[{ required: true, message: 'Vui lòng nhập tài khoản!' }]} 
+                />
+                
+                <FormInput 
+                    label="Mật khẩu" 
+                    name="password" 
+                    type="password" 
+                    prefix={<LockOutlined className="text-gray-400" />}
+                    placeholder="••••••••" 
+                    rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]} 
+                />
+
+                <Form.Item className="mt-6 mb-0">
+                    {/* Nút bấm tự động biến thành nút Submit của form */}
+                    <Button htmlType="submit" isLoading={isLoading}>
+                        Đăng Nhập
+                    </Button>
                 </Form.Item>
-                <Form.Item
-                    label="Mật khẩu"
-                    name="password"
-                    rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
-                >
-                    <Input.Password />
-                </Form.Item>
-                <Button type="primary" htmlType="submit" block loading={loading}>
-                    Đăng nhập
-                </Button>
-                <Button
-                    type="link"
-                    block
-                    onClick={() => navigate("/register")}
-                    style={{ marginTop: "10px" }}
-                >
-                    Chưa có tài khoản? Đăng ký
-                </Button>
             </Form>
-        </Card>
-    </div>
-  )
-}
 
-export default LoginPage
+            <div className="text-center mt-6">
+                <span className="text-gray-500">Chưa có tài khoản? </span>
+                <Link to="/register" className="text-[#0068ff] font-semibold hover:underline">
+                    Đăng ký ngay
+                </Link>
+            </div>
+        </AuthLayout>
+    );
+};
+
+export default LoginPage;
