@@ -71,3 +71,7 @@ export const acceptFriendRequest = async (senderId) => {
 export const removeFriendOrRequest = async (targetUserId) => {
     return await axiosClient.delete(`/users/friends/${targetUserId}`);
 };
+
+export const getMe = async (current_user) => {
+    return await axiosClient.get('/user/getMe/')
+}
