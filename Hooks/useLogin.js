@@ -7,39 +7,37 @@ export const useLogin = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    const executeLogin = async (username, password, remember = false) => {
+    const executeLogin = async (username, password, remember) => {
         setIsLoading(true);
         setError(null);
 
         try {
-            // Hàm login trong auth.js đã xử lý việc lưu token vào đúng storage
-            // dựa theo tham số remember, nên ở đây chỉ cần truyền vào là xong
-            const response = await login(username, password, remember);
+           const response = await login(username, password, remember);
 
-            if (response?.access_token) {
+           if(response && response.access_token) {
+                const storage = remember ? localStorage : sessionStorage;
+                storage.setItem("access_token", response.access_token);
+                if (response.id) storage.setItem("user_id", response.id);
+                // Nếu BE trả về user_info thì lưu luôn
+                if (response.user) storage.setItem("user_info", JSON.stringify(response.user));
+
                 navigate("/", { replace: true });
+           } else {
+                setError("Hệ thống không cấp được token.");
+           }
+        } 
+        catch (err) {
+            // BẮT LỖI SAI TÀI KHOẢN/MẬT KHẨU
+            if (err.response && (err.response.status === 400 || err.response.status === 401)) {
+                setError("Tài khoản hoặc mật khẩu không chính xác!");
             } else {
-                setError("Hệ thống không cấp được token. Vui lòng thử lại.");
+                setError(err.response?.data?.detail || "Đăng nhập thất bại. Vui lòng thử lại!");
             }
-        } catch (err) {
-            if (!err.response) {
-            setError("Không thể kết nối đến server");
-            return;
-    }
-            const detail = err?.response?.data?.detail;
-
-            // Phân biệt lỗi sai username vs sai password nếu BE trả về đủ thông tin
-            if (typeof detail === 'string') {
-                setError(detail);
-            } else if (Array.isArray(detail)) {
-                setError(detail.map(d => d.msg).join(', '));
-            } else {
-                setError("Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.");
-            }
-        } finally {
+        }   
+        finally {
             setIsLoading(false);
         }
     };
-
-    return { executeLogin, isLoading, error };
-};
+    
+    return { executeLogin, isLoading, error };   
+}
