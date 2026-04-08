@@ -1,178 +1,103 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-import { useLogin } from '../../Hooks/useLogin';
+import { UserOutlined, LockOutlined } from '@ant-design/icons'; 
+import { Alert } from 'antd';
+import { useLogin } from '../../Hooks/useLogin'; 
 import AuthLayout from '../components/layout/AuthLayout';
 import FormInput from '../components/ui/FormInput';
-import Button from '../components/ui/Button';
-
-const UserIcon = () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
-    </svg>
-);
-
-const LockIcon = () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2"/>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-    </svg>
-);
-
-const AlertIcon = () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '1px' }}>
-        <circle cx="12" cy="12" r="10"/>
-        <line x1="12" y1="8" x2="12" y2="12"/>
-        <line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
-);
+import Button from '../components/ui/Button'; // Import cục Button siêu đẹp của bạn vào đây
 
 const LoginPage = () => {
     const { executeLogin, isLoading, error } = useLogin();
-
+    
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [remember, setRemember] = useState(false);
-
-    const [errors, setErrors] = useState({ username: '', password: '' });
-
-    // Reset lỗi inline khi user bắt đầu gõ lại
-    useEffect(() => {
-        if (username) setErrors(prev => ({ ...prev, username: '' }));
-    }, [username]);
-
-    useEffect(() => {
-        if (password) setErrors(prev => ({ ...prev, password: '' }));
-    }, [password]);
-
-    const validate = () => {
-        const next = { username: '', password: '' };
-        if (!username.trim()) next.username = 'Vui lòng nhập tài khoản';
-        if (!password) next.password = 'Vui lòng nhập mật khẩu';
-        setErrors(next);
-        return !next.username && !next.password;
-    };
+    
+    const [localError, setLocalError] = useState('');
 
     const handleSubmit = (e) => {
-        e?.preventDefault();
-        if (!validate()) return;
+        e.preventDefault();
+        setLocalError('');
+        
+        if (!username.trim() || !password) {
+            return setLocalError('Vui lòng nhập đầy đủ tài khoản và mật khẩu!');
+        }
+         
         executeLogin(username.trim(), password, remember);
     };
 
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') handleSubmit();
-    };
-
     return (
-        <AuthLayout
-            title="ChatAgent"
-            subtitle="Kết nối, chia sẻ và trải nghiệm cùng bạn bè mọi lúc mọi nơi."
-        >
+        <AuthLayout title="ChatAgent" subtitle="Kết nối, chia sẻ và trải nghiệm cùng bạn bè mọi lúc mọi nơi.">
             <div>
-                <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#1a1a1a', marginBottom: '4px' }}>
-                    Đăng nhập
-                </h2>
-                <p style={{ fontSize: '13px', color: '#888', marginBottom: '24px' }}>
-                    Nhập thông tin tài khoản của bạn để tiếp tục
-                </p>
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">Đăng nhập</h2>
+                <p className="text-sm text-gray-500 mb-6">Nhập thông tin tài khoản của bạn để tiếp tục</p>
 
-                {/* Banner lỗi từ server */}
-                {error && (
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '8px',
-                        background: '#fff2f2',
-                        border: '1px solid #ffc9c9',
-                        borderRadius: '8px',
-                        padding: '10px 13px',
-                        marginBottom: '16px',
-                        fontSize: '13px',
-                        color: '#c0392b',
-                        lineHeight: 1.5,
-                    }}>
-                        <AlertIcon />
-                        <span>{error}</span>
+                {/* Khung Báo Lỗi */}
+                {(localError || error) && (
+                    <div className="mb-6">
+                        <Alert
+                            message={localError || error}
+                            type="error"
+                            showIcon
+                        />
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} noValidate>
+                <form onSubmit={handleSubmit}>
                     <FormInput
                         label="Tài khoản"
-                        name="username"
                         type="text"
-                        prefix={<UserIcon />}
-                        placeholder="Nhập username"
+                        placeholder="Nhập username hoặc email"
+                        prefix={<UserOutlined className="text-gray-400" />}
                         value={username}
-                        onChange={e => setUsername(e.target.value)}
-                        error={errors.username}
+                        onChange={(e) => {
+                            setUsername(e.target.value);
+                            setLocalError(''); 
+                        }}
                         disabled={isLoading}
                     />
 
                     <FormInput
                         label="Mật khẩu"
-                        name="password"
                         type="password"
-                        prefix={<LockIcon />}
                         placeholder="••••••••"
+                        prefix={<LockOutlined className="text-gray-400" />}
                         value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        error={errors.password}
+                        onChange={(e) => {
+                            setPassword(e.target.value);
+                            setLocalError('');
+                        }}
                         disabled={isLoading}
                     />
 
-                    {/* Remember me + Forgot password */}
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        margin: '4px 0 22px',
-                    }}>
-                        <label style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '7px',
-                            cursor: 'pointer',
-                            fontSize: '13px',
-                            color: '#555',
-                            userSelect: 'none',
-                        }}>
+                    <div className="flex items-center justify-between my-5 text-sm">
+                        <label className="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-gray-900 select-none">
                             <input
                                 type="checkbox"
                                 checked={remember}
-                                onChange={e => setRemember(e.target.checked)}
+                                onChange={(e) => setRemember(e.target.checked)}
                                 disabled={isLoading}
-                                style={{ accentColor: '#0068ff', width: '15px', height: '15px', cursor: 'pointer' }}
+                                className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
                             />
                             Ghi nhớ đăng nhập
                         </label>
-
-                        <Link
-                            to="/forgot-password"
-                            style={{ fontSize: '13px', color: '#0068ff', textDecoration: 'none', fontWeight: 500 }}
-                        >
-                            Quên mật khẩu?
-                        </Link>
                     </div>
 
-                    <Button type="submit" isLoading={isLoading}>
-                        Đăng nhập
+                    <Button htmlType="submit" isLoading={isLoading} >
+                        Đăng Nhập
                     </Button>
                 </form>
 
-                <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px', color: '#888' }}>
+                <p className="text-center mt-6 text-sm text-gray-500">
                     Chưa có tài khoản?{' '}
-                    <Link
-                        to="/register"
-                        style={{ color: '#0068ff', fontWeight: 600, textDecoration: 'none' }}
-                    >
+                    <Link to="/register" className="text-[#0068ff] font-semibold hover:underline">
                         Đăng ký ngay
                     </Link>
                 </p>
             </div>
         </AuthLayout>
+        // </div>
     );
 };
 

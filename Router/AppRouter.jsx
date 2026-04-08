@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from '../src/page/LoginPage';
-import { RegisterPage } from '../src/page/RegisterPage';
+import RegisterPage from '../src/page/RegisterPage';
 import DashboardPage from '../src/page/DashboardPage';
 import { getMe } from '../src/api/auth'; 
 

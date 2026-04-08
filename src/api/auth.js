@@ -1,8 +1,5 @@
 import axiosClient from "./axios";
 
-// ==========================================
-// PHẦN 1: XÁC THỰC (AUTHENTICATION)
-// ==========================================
 
 export const register = async (userData) => {
     // Nhận vào cục object userData (gồm username, password, email...) 

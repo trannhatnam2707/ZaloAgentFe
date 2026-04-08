@@ -47,6 +47,12 @@ axiosClient.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
+    
+    // Nếu API đang gọi là API Đăng nhập, BỎ QUA toàn bộ luồng xử lý bên dưới
+    // Trả lỗi thẳng về cho file useLogin.js để hiện lên màn hình cho người dùng!
+    if (originalRequest.url.includes('/users/login') || originalRequest.url.includes('/login')) {
+      return Promise.reject(error);
+    }
 
     // Bắt lỗi 401 (Unauthorized - Hết hạn Access Token)
     if (error.response?.status === 401 && !originalRequest._retry) {

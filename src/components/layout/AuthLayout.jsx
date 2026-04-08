@@ -1,4 +1,6 @@
 import React from 'react';
+import logo from '../../assets/chat-agent-logo.svg';
+import image from '../../assets/image.png';
 
 const AuthLayout = ({ title, subtitle, children }) => {
     return (
@@ -7,7 +9,7 @@ const AuthLayout = ({ title, subtitle, children }) => {
             height: '100vh',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#f0f2f5',
+            backgroundColor: '#E3F2FD',
             fontFamily: "'Segoe UI', sans-serif",
         }}>
             <div style={{
@@ -26,31 +28,34 @@ const AuthLayout = ({ title, subtitle, children }) => {
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
+                    alignItems: 'center',
                     padding: '36px 28px',
                     flexShrink: 0,
                 }}>
-                    {/* Logo */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {/* Logo + Title */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', alignSelf: 'flex-start' }}>
                         <div style={{
-                            width: '34px', height: '34px',
-                            borderRadius: '8px',
-                            background: 'rgba(255,255,255,0.2)',
+                            width: '40px', height: '40px',
+                            borderRadius: '12px',
+                            background: 'rgba(255,255,255,0.16)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 2L2 7l10 5 10-5-10-5z" fill="white"/>
-                                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
+                            <img src={logo} alt="ChatAgent logo" style={{ width: '26px', height: '26px' }} />
                         </div>
                         <span style={{ fontSize: '17px', fontWeight: 600, color: '#fff' }}>{title}</span>
                     </div>
 
+                    {/* Center Logo - Large */}
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <img src={image} alt="ChatAgent large image" style={{ width: '200px', height: '200px', opacity: 0.9, borderRadius: "15px"}} />
+                    </div>
+
                     {/* Tagline + dots */}
-                    <div>
+                    <div style={{ width: '100%', textAlign: 'center' }}>
                         <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, marginBottom: '20px' }}>
                             {subtitle}
                         </p>
-                        <div style={{ display: 'flex', gap: '6px' }}>
+                        <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
                             <div style={{ height: '4px', width: '20px', borderRadius: '2px', background: '#fff' }} />
                             <div style={{ height: '4px', width: '8px', borderRadius: '2px', background: 'rgba(255,255,255,0.3)' }} />
                             <div style={{ height: '4px', width: '8px', borderRadius: '2px', background: 'rgba(255,255,255,0.3)' }} />
