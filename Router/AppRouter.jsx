@@ -11,18 +11,19 @@ const PrivateRoute = ({ children }) => {
 
     useEffect(() => {
         const verifyToken = async () => {
-            const token = localStorage.getItem("access_token");
+            const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
           
             if (!token) {
                 setIsAuth(false);
                 setIsLoading(false);
+                console.log("Tài khoản không được xác thực")
                 return;
             }
             try {
                 const userData = await getMe();  
                 // Tiện tay cập nhật lại thông tin mới nhất vào LocalStorage 
                 // (Phòng trường hợp user đổi tên ở máy khác)
-                localStorage.setItem("user_info", JSON.stringify(userData));
+                localStorage.setItem("user_info", JSON.stringify(userData)) ||  sessionStorage.setItem("user_info", JSON.stringify(userData)) ;
                 setIsAuth(true);
             } catch (error) {
                 console.error("Token không hợp lệ, văng ra Login!");
@@ -47,7 +48,7 @@ const PrivateRoute = ({ children }) => {
     return isAuth ? children : <Navigate to="/login" replace />;
 };
 const PublicRoute = ({ children }) => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
     return !token ? children : <Navigate to="/" replace />;
 };
 
