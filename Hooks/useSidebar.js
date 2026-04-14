@@ -1,30 +1,31 @@
-// src/hooks/useSidebar.js
 import { useState, useEffect } from 'react';
-import { getMyConversation } from '../api/conservation';
-import { searchUsers, getFriendsList, sendFriendRequest, acceptFriendRequest, removeFriendOrRequest } from '../api/auth';
+import { getMyConversation } from '../src/api/conservation';
+import { searchUsers, getFriendsList } from '../src/api/auth';
 
 export const useSidebar = () => {
     const [conversations, setConversations] = useState([]);
-    const [searchResults, setSearchResults] = useState([]);
     const [friendRequests, setFriendRequests] = useState([]);
+    const [searchResults, setSearchResults] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState('chat'); // 'chat' hoặc 'requests'
+    const [activeTab, setActiveTab] = useState('chat'); 
     const [loading, setLoading] = useState(false);
 
-    // Lấy danh sách hội thoại
-    const fetchConversations = async () => {
+    const fetchData = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
-            const data = await getMyConversation();
-            setConversations(data);
+            const [convRes, friendRes] = await Promise.all([
+                getMyConversation(),
+                getFriendsList()
+            ]);
+            setConversations(convRes || []);
+            setFriendRequests(friendRes?.requests || []); 
         } catch (error) {
-            console.error("Lỗi lấy danh sách hội thoại:", error);
+            console.error("Lỗi Sidebar:", error);
         } finally {
             setLoading(false);
         }
     };
 
-    // Tìm kiếm người dùng (khi nhập sẽ hiển thị đè lên)
     const handleSearch = async (keyword) => {
         setSearchTerm(keyword);
         if (!keyword.trim()) {
@@ -33,37 +34,15 @@ export const useSidebar = () => {
         }
         try {
             const data = await searchUsers(keyword);
-            setSearchResults(data);
+            setSearchResults(data || []);
         } catch (error) {
             console.error("Lỗi tìm kiếm:", error);
         }
     };
 
-    // Lấy danh sách bạn bè/lời mời
-    const fetchFriendsData = async () => {
-        try {
-            const data = await getFriendsList();
-            // Giả định BE trả về object có chứa lời mời kết bạn
-            setFriendRequests(data.requests || []); 
-        } catch (error) {
-            console.error("Lỗi lấy danh sách lời mời:", error);
-        }
-    };
-
     useEffect(() => {
-        fetchConversations();
-        fetchFriendsData();
+        fetchData();
     }, []);
 
-    return {
-        conversations,
-        searchResults,
-        friendRequests,
-        searchTerm,
-        activeTab,
-        loading,
-        setActiveTab,
-        handleSearch,
-        refresh: fetchConversations
-    };
+    return { conversations, friendRequests, searchResults, searchTerm, activeTab, setActiveTab, handleSearch, refresh: fetchData };
 };
