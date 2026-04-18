@@ -1,8 +1,8 @@
 import { UsergroupAddOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Avatar, Button, Input, Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { getMe, logout } from '../../../api/auth'; // Đảm bảo đã import logout
-
+import { getMe, logout } from '../../../api/auth'; 
+import ChatList from '../ChatList';
 const SidebarLeft = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -23,7 +23,7 @@ const SidebarLeft = () => {
     {
       key: "1",
       label: "Tin nhắn",
-      children: <div style={{ padding: '10px' }}>{/* <ChatList/> */} Danh sách chat sẽ ở đây</div>
+      children: <div style={{ padding: '10px' }}><ChatList/></div>
     },
     {
       key: "2",
@@ -37,8 +37,6 @@ const SidebarLeft = () => {
       display: 'flex', 
       flexDirection: 'column', 
       height: '100%', 
-      // width: '100%', 
-      // overflow: 'hidden',
       backgroundColor: '#FFF',
       borderRight: '1px solid #f0f0f0' 
     }}>
@@ -67,7 +65,7 @@ const SidebarLeft = () => {
       </div>
       
       <div style={{ flex: 1, overflowY: "auto", width:"100%", maxWidth:"100%" }}>
-        <Tabs defaultActiveKey="1" items={items} centered  style={{ width: '100%'}}/>
+        <Tabs defaultActiveKey="1" items={items} centered  style={{width:"100%"}}/>
       </div>
 
       <div style={{ 
