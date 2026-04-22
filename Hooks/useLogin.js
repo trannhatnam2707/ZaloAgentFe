@@ -15,11 +15,11 @@ export const useLogin = () => {
            const response = await login(username, password, remember);
 
            if(response && response.access_token) {
-                const storage = remember ? localStorage : sessionStorage;
-                storage.setItem("access_token", response.access_token);
-                if (response.id) storage.setItem("user_id", response.id);
-                // Nếu BE trả về user_info thì lưu luôn
-                if (response.user) storage.setItem("user_info", JSON.stringify(response.user));
+                // const storage = remember ? localStorage : sessionStorage;
+                // storage.setItem("access_token", response.access_token);
+                // if (response.id) storage.setItem("user_id", response.id);
+                // // Nếu BE trả về user_info thì lưu luôn
+                // if (response.user) storage.setItem("user_info", JSON.stringify(response.user));
 
                 navigate("/", { replace: true });
            } else {

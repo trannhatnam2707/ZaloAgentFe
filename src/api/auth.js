@@ -21,6 +21,8 @@ export const login = async (username, password, remember = false) => {
         storage.setItem("access_token", data.access_token);
         storage.setItem("refresh_token", data.refresh_token);
         storage.setItem("user_info", JSON.stringify(data.user)); 
+        storage.setItem("user_id", data.user?.id || data.id || "");
+        localStorage.setItem("storage_type", remember ? "local" : "session")
     }
 
     return data;

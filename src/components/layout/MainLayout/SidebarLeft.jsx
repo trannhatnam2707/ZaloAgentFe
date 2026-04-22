@@ -3,6 +3,7 @@ import { Avatar, Button, Input, Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { getMe, logout } from '../../../api/auth'; 
 import ChatList from '../ChatList';
+import FriendsRequestList from '../FriendsRequestList';
 const SidebarLeft = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -28,7 +29,7 @@ const SidebarLeft = () => {
     {
       key: "2",
       label: "Thông báo",
-      children: <div style={{ padding: '10px' }}>{/* <FriendsRequestList/> */} Lời mời kết bạn</div>
+      children: <div style={{ padding: '10px' }}><FriendsRequestList/></div>
     }
   ];
 
