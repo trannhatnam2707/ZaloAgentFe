@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { UserOutlined, IdcardOutlined, LockOutlined } from '@ant-design/icons'; 
+import { UserOutlined, IdcardOutlined, LockOutlined } from '@ant-design/icons';
 import { Form, Alert } from 'antd';
-import { useRegister } from '../../Hooks/useRegister'; 
+import { useRegister } from '../../Hooks/useRegister';
 import AuthLayout from '../components/layout/AuthLayout';
 import FormInput from '../components/ui/FormInput';
 import Button from '../components/ui/Button';
@@ -10,24 +10,24 @@ import Button from '../components/ui/Button';
 const RegisterPage = () => {
     const [form] = Form.useForm();
     const { executeRegister, isLoading, error } = useRegister();
-    
+
     // Tách đủ 4 State tương ứng với 4 trường
     const [account, setAccount] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [reEnterPassword, setReEnterPassword] = useState('');
-    
+
     const [localError, setLocalError] = useState('');
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         // Kiểm tra không bỏ trống bất kỳ ô nào
         if (!account.trim() || !username.trim() || !password || !reEnterPassword) {
             return setLocalError('Vui lòng điền đầy đủ tất cả thông tin!');
         }
-        
-        // Kiểm tra mật khẩu khớp nhau
+
+        // Kiểm tra mật khẩu khớp nhau`
         if (password !== reEnterPassword) {
             return setLocalError('Mật khẩu nhập lại không trùng khớp!');
         }
@@ -60,9 +60,9 @@ const RegisterPage = () => {
                         placeholder="Nhập tên đăng nhập viết liền"
                         prefix={<IdcardOutlined className="text-gray-400" />}
                         value={account}
-                        onChange={(e) => { 
-                            setAccount(e.target.value); 
-                            setLocalError(''); 
+                        onChange={(e) => {
+                            setAccount(e.target.value);
+                            setLocalError('');
                         }}
                         disabled={isLoading}
                     />
@@ -74,9 +74,9 @@ const RegisterPage = () => {
                         placeholder="Nhập tên sẽ hiển thị trên app"
                         prefix={<UserOutlined className="text-gray-400" />}
                         value={username}
-                        onChange={(e) => { 
-                            setUsername(e.target.value); 
-                            setLocalError(''); 
+                        onChange={(e) => {
+                            setUsername(e.target.value);
+                            setLocalError('');
                         }}
                         disabled={isLoading}
                     />
@@ -88,9 +88,9 @@ const RegisterPage = () => {
                         placeholder="••••••••"
                         prefix={<LockOutlined className="text-gray-400" />}
                         value={password}
-                        onChange={(e) => { 
-                            setPassword(e.target.value); 
-                            setLocalError(''); 
+                        onChange={(e) => {
+                            setPassword(e.target.value);
+                            setLocalError('');
                         }}
                         disabled={isLoading}
                     />
@@ -102,16 +102,16 @@ const RegisterPage = () => {
                         placeholder="Nhập lại mật khẩu"
                         prefix={<LockOutlined className="text-gray-400" />}
                         value={reEnterPassword}
-                        onChange={(e) => { 
-                            setReEnterPassword(e.target.value); 
-                            setLocalError(''); 
+                        onChange={(e) => {
+                            setReEnterPassword(e.target.value);
+                            setLocalError('');
                         }}
                         disabled={isLoading}
                     />
 
-                    <Button 
-                        htmlType="submit" 
-                        isLoading={isLoading} 
+                    <Button
+                        htmlType="submit"
+                        isLoading={isLoading}
                         className="!h-[44px] w-full !text-[14.5px] hover:!opacity-90 transition-opacity mt-2"
                     >
                         Tạo Tài Khoản Mới

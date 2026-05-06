@@ -4,8 +4,20 @@ import React, { useEffect, useState } from 'react';
 import { getMe, logout } from '../../../api/auth'; 
 import ChatList from '../ChatList';
 import FriendsRequestList from '../FriendsRequestList';
+import FriendsList from '../FriendsList';
+
 const SidebarLeft = () => {
   const [currentUser, setCurrentUser] = useState(null);
+  const [activeTab, setActiveTab] = useState("1")
+
+  const handleSelectFriend = (friend) => {
+    console.log("Mở chat với user:" , friend.username)
+
+    setActiveTab("1")
+
+    // 2. (Nâng cao) Bạn có thể gọi một hàm Global Context hoặc Redux 
+    // để báo cho khung chat bên phải hiển thị tin nhắn của 'friend' này.
+  }
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -25,12 +37,19 @@ const SidebarLeft = () => {
       key: "1",
       label: "Tin nhắn",
       children: <div style={{ padding: '10px' }}><ChatList/></div>
+    }, 
+    {
+      key:"2",
+      label: "Bạn bè",
+      children: <div style={{ padding: '10px' }}><FriendsList onSelectFriend={handleSelectFriend}/></div>
     },
     {
-      key: "2",
+      key: "3",
       label: "Thông báo",
       children: <div style={{ padding: '10px' }}><FriendsRequestList/></div>
-    }
+    },
+  
+
   ];
 
   return (
@@ -66,7 +85,7 @@ const SidebarLeft = () => {
       </div>
       
       <div style={{ flex: 1, overflowY: "auto", width:"100%", maxWidth:"100%" }}>
-        <Tabs defaultActiveKey="1" items={items} centered  style={{width:"100%"}}/>
+        <Tabs activeKey={activeTab} onChange={(key) => setActiveTab(key)} items={items} centered  style={{width:"100%"}}/>
       </div>
 
       <div style={{ 
