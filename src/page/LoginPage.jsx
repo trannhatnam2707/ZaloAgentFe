@@ -72,13 +72,13 @@ const LoginPage = () => {
                     />
 
                     <div className="flex items-center justify-between my-5 text-sm">
-                        <label className="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-gray-900 select-none">
+                        <label className="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-gray-900 select-none ">
                             <input
                                 type="checkbox"
                                 checked={remember}
                                 onChange={(e) => setRemember(e.target.checked)}
                                 disabled={isLoading}
-                                className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
+                                className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer "
                             />
                             Ghi nhớ đăng nhập
                         </label>
@@ -89,7 +89,7 @@ const LoginPage = () => {
                     </Button>
                 </form>
 
-                <p className="text-center mt-6 text-sm text-gray-500">
+                <p className="text-center mt-6 text-sm text-gray-500 ">
                     Chưa có tài khoản?{' '}
                     <Link to="/register" className="text-[#0068ff] font-semibold hover:underline">
                         Đăng ký ngay

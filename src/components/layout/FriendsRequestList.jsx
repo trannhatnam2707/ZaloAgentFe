@@ -12,8 +12,9 @@ const FriendsRequestList = () => {
             setLoading(true);
             const res = await getFriendsList(); 
             // Lọc status pending
-            const pendingRequests = (res || []).filter(item => item.status === "pending");
+            const pendingRequests = (res?.friend_requests || []).filter(item => item.status === "pending");
             setRequests(pendingRequests);
+            console.log("debug1:", pendingRequests)
         } catch (err) {
             message.error("Lấy danh sách thất bại");
             console.log("Lỗi lấy lời mời: ", err);
