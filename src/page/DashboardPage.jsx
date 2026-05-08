@@ -17,7 +17,7 @@ const DashboardPage = () => {
       </Sider>
 
       <Layout>
-        <Content style={{ background: '#f5f5f5' }}>
+         <Content style={{ background: '#f5f5f5' }}>
           <div style={{ 
             height: '100%', 
             display: 'flex', 
@@ -25,9 +25,9 @@ const DashboardPage = () => {
             alignItems: 'center',
             color: '#999'
           }}>
-            Chọn một cuộc trò chuyện để bắt đầu
+            <CenterLayout/>
           </div>
-        </Content>
+        </Content> 
       </Layout>
 
       <Sider 

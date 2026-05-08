@@ -4,11 +4,14 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import 'antd/dist/reset.css';
+import { ChatProvider } from './context/ChatContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   // <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ChatProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ChatProvider>
   //  {/* </StrictMode>  */}
 )

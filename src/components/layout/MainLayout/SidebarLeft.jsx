@@ -1,36 +1,28 @@
 import { UsergroupAddOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Avatar, Button, Input, Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { getMe, logout } from '../../../api/auth'; 
+import { logout } from '../../../api/auth'; 
 import ChatList from '../ChatList';
 import FriendsRequestList from '../FriendsRequestList';
 import FriendsList from '../FriendsList';
+import { useChat } from '../../../context/ChatContext';
+import { useAuth } from '../../../../Hooks/useAuth';
 
 const SidebarLeft = () => {
-  const [currentUser, setCurrentUser] = useState(null);
   const [activeTab, setActiveTab] = useState("1")
+  const {setSelectedChat} = useChat()
+  const {user: currentUser } = useAuth()
+
 
   const handleSelectFriend = (friend) => {
     console.log("Mở chat với user:" , friend.username)
 
     setActiveTab("1")
 
-    // 2. (Nâng cao) Bạn có thể gọi một hàm Global Context hoặc Redux 
-    // để báo cho khung chat bên phải hiển thị tin nhắn của 'friend' này.
+    setSelectedChat(friend)
+
   }
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await getMe();
-        // axiosClient của bạn trả về data trực tiếp, không cần .data trừ khi bạn bọc thêm
-        setCurrentUser(res); 
-      } catch (err) {
-        console.error("Không lấy được thông tin user", err);
-      }
-    };
-    fetchUser();
-  }, []);
 
   const items = [
     {

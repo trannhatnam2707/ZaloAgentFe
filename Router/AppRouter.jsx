@@ -4,38 +4,11 @@ import LoginPage from '../src/page/LoginPage';
 import RegisterPage from '../src/page/RegisterPage';
 import DashboardPage from '../src/page/DashboardPage';
 import { getMe } from '../src/api/auth'; 
+import { useAuth } from '../Hooks/useAuth';
 
 const PrivateRoute = ({ children }) => {
-    const [isAuth, setIsAuth] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const verifyToken = async () => {
-            const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-          
-            if (!token) {
-                setIsAuth(false);
-                setIsLoading(false);
-                console.log("Tài khoản không được xác thực")
-                return;
-            }
-            try {
-                const userData = await getMe();  
-                // Tiện tay cập nhật lại thông tin mới nhất vào LocalStorage 
-                // (Phòng trường hợp user đổi tên ở máy khác)
-                localStorage.setItem("user_info", JSON.stringify(userData)) ||  sessionStorage.setItem("user_info", JSON.stringify(userData)) ;
-                setIsAuth(true);
-            } catch (error) {
-                console.error("Token không hợp lệ, văng ra Login!");
-                localStorage.clear();
-                setIsAuth(false);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        verifyToken();
-    }, []); 
+    const {isAuth, isLoading} = useAuth() 
+    
     if (isLoading) {
         return (
             <div className="h-screen w-screen flex flex-col items-center justify-center bg-gray-50">

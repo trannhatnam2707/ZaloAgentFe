@@ -1,12 +1,16 @@
 import { List, message, Spin, Avatar} from 'antd';
 import React, { useEffect, useState } from 'react'
 import { getFriendsList } from '../../api/auth';
+import { useChat } from '../../context/ChatContext';
 
 
 const FriendsList = ({onSelectFriend}) => {
 
     const [friends, setFriends] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    // const {selectedChat} = useChat()
+
     
     const handleOpenChat = (friend) => {
         if (onSelectFriend)
@@ -21,7 +25,7 @@ const FriendsList = ({onSelectFriend}) => {
             const res = await getFriendsList();
             const list = (res?.friends || [])
             setFriends(list);
-            console.log("debug2:", friends)
+            console.log("debug2:", list)
         }
         catch(err)
         {
@@ -49,12 +53,30 @@ const FriendsList = ({onSelectFriend}) => {
                     renderItem={(item)=> (
                         <List.Item 
                             onClick={() => handleOpenChat(item)}  
-                            style={{cursor:"pointer"}}  
+                            style={{
+                                cursor:"pointer",
+                                // backgroundColor: selectedChat?.id === item.id ? '#e6f7ff' : 'transparent',
+                                padding: '10px 15px'
+                            }}  
                         >
-                            <List.Item.Meta
-                                avatar={<Avatar src={item.avatar}>{item.username?.charAt(0).toUpperCase()}</Avatar>}
-                                title={item.display_name || item.username}
-                            />
+                         <List.Item.Meta
+                            avatar={
+                                <Avatar src={item.avatar} size={40}>
+                                    {item.username?.charAt(0).toUpperCase()}
+                                </Avatar>
+                            }
+                            title={
+                                <div style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    fontWeight: "500",
+                                    // fontWeight: selectedChat?.id === item.id ? 'bold' : 'normal',
+                                    height: 40 
+                                }}>
+                                    {item.display_name || item.username}
+                                </div>
+                            }
+                        />
                         </List.Item>
                     )}
                 />
