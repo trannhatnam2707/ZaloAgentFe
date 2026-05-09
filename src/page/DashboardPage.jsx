@@ -17,13 +17,10 @@ const DashboardPage = () => {
       </Sider>
 
       <Layout>
-         <Content style={{ background: '#f5f5f5' }}>
+         <Content style={{ background: '#fff', borderRight: '1px solid #f0f0f0' }}>
           <div style={{ 
             height: '100%', 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center',
-            color: '#999'
+            display: 'flex'
           }}>
             <CenterLayout/>
           </div>
@@ -32,7 +29,7 @@ const DashboardPage = () => {
 
       <Sider 
         width={320} 
-        style={{ background: '#fff', borderRight: '1px solid #f0f0f0' }}
+        style={{ background: '#fff', borderLeft: '1px solid #f0f0f0' }}
       >
         <SidebarRight />
       </Sider>

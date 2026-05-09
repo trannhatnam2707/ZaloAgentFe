@@ -13,19 +13,21 @@ const ChatHeader = () => {
     return (
         <div style={{
             padding: '10px 20px',
-            borderRadius: '1px solid #f0f0f0',
+            width: '100%',
+            borderBottom: '1px solid #f0f0f0',
+            boxSizing: 'border-box',
             display:"flex",
             alignItems:'center',
             justifyContent:'space-between',
             backgroundColor:'#4c8ae5'
         }}>
             <div style={{display:"flex", alignItems:"center", gap:'12px'}}>
-                <Avatar src={headerInfo.avatar} size={40} style={{border:"1px solid #f0f0f0"}}>
-                    {headerInfo.title?.charAt(0).toUpperCase()}
+                <Avatar src={headerInfo.avatar || undefined} size={40} style={{border:"1px solid #f0f0f0"}}>
+                    {(headerInfo.title || headerInfo.name)?.charAt(0).toUpperCase()}
                 </Avatar>
                 <div>
                     <div style={{ fontWeight:'600', fontSize: "16px", lineHeight:'1.2'}}>
-                        {headerInfo.title}
+                        {headerInfo.title || headerInfo.name}
                     </div>
                     <div style={{ fontSize: '12px', color: '#52c41a' }}>
                         {headerInfo.type === 'group' ? 'Nhóm chat' : 'Đang hoạt động'}

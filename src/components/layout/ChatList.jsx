@@ -51,7 +51,7 @@ const ChatList = () => {
                     if (isGroup) {
                         // CHỈ bôi đen nhóm nếu selectedChat hiện tại cũng là Group 
                         // và có _id trùng khớp hoàn toàn.
-                        isActive = selectedChat?.type === 'group' && String(selectedChat?._id) === String(item._id);
+                        isActive = selectedChat?.type === 'group' && String(selectedChat?.id) === String(item.id);
                     } else {
                         // Đối với chat cá nhân: Tìm Partner ID
                         const partnerId = item.members?.find(id => String(id) !== String(currentUser?.id));

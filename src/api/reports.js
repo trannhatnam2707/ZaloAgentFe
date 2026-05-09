@@ -5,8 +5,8 @@ export const createReports = async(reportData) => {
     const res = await axiosClient.post("/reports/", reportData)
     return res.data
 }
-export const getAllReports = async() => {
-    const res = await axiosClient.get("/reports/")
+export const getReportsByConversation = async(conversationId) => {
+    const res = await axiosClient.get(`/reports/conversation/${conversationId}`)
     return res.data
 };
 
