@@ -2,25 +2,21 @@ import axiosClient from "./axios"
 
 
 export const createReports = async(reportData) => {
-    const res = await axiosClient.post("/reports/", reportData)
-    return res.data
+    return await axiosClient.post("/reports/", reportData)
 }
 export const getReportsByConversation = async(conversationId) => {
-    const res = await axiosClient.get(`/reports/conversation/${conversationId}`)
-    return res.data
+    return await axiosClient.get(`/reports/conversation/${conversationId}`)
 };
 
 
 export const updateReport = async(reportId, updateData) => {
-    const res = await axiosClient.put(`/reports/${reportId}`, updateData)
-    return res.data
+    return await axiosClient.put(`/reports/${reportId}`, updateData)
 }
 
 export const getReportsByUser =  async(userID) => {
-    const res = await axiosClient.get(`/reports/user/${userID}`)
-    return res.data
+    return await axiosClient.get(`/reports/user/${userID}`)
 }
 
 export const deleteReports = async(reportId) => {
-    const res = await axiosClient.delete(`/reports/${reportId}`)
+   return await axiosClient.delete(`/reports/${reportId}`)
 }

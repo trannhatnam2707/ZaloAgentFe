@@ -22,13 +22,16 @@ export const useAuth = () => {
             setUser(userData)
             console.log("getMe:" , userData)
             setIsAuth(true)
-            // Tiện tay cập nhật lại thông tin mới nhất vào LocalStorage 
-            // (Phòng trường hợp user đổi tên ở máy khác)
-            localStorage.setItem("user_info", JSON.stringify(userData)) ||  sessionStorage.setItem("user_info", JSON.stringify(userData)) 
+            const hasLocalToken = localStorage.getItem("access_token") !== null
+            const storage = hasLocalToken ? localStorage : sessionStorage
+            storage.setItem("user_info", JSON.stringify(userData))
         }
         catch (err) {
             console.error("Auth failed: ", err)
-            localStorage.clear() || sessionStorage.clear()
+            if (err.response?.status === 401) {
+                localStorage.clear()
+                sessionStorage.clear()
+            }
             setIsAuth(false)
         }
         finally {

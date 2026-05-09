@@ -41,7 +41,7 @@ const ChatHeader = ({ info }) => {
                         shape='circle'
                         icon = {<InfoCircleFilled style={{
                             fontSize: '18px',
-                            color: showRightSidebar ? '#1677ff' : "8c8c8c"
+                            color: showRightSidebar ? '#1677ff' : "#8c8c8c"
                         }}/>}
                             onClick={() => {setShowRightSidebar(!showRightSidebar)}}
                     />

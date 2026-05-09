@@ -2,10 +2,13 @@ import { Layout } from 'antd';
 import SidebarLeft from "../components/layout/MainLayout/SidebarLeft";
 import SidebarRight from '../components/layout/MainLayout/SidebarRight';
 import CenterLayout from '../components/layout/MainLayout/CenterLayout';
+import { useChat } from '../context/ChatContext';
 
 const { Sider, Content } = Layout;
 
 const DashboardPage = () => {
+  const { showRightSidebar } = useChat();
+
   return (
     <Layout style={{ height: '100vh' }}>
     
@@ -27,12 +30,14 @@ const DashboardPage = () => {
         </Content> 
       </Layout>
 
-      <Sider 
-        width={320} 
-        style={{ background: '#fff', borderLeft: '1px solid #f0f0f0' }}
-      >
-        <SidebarRight />
-      </Sider>
+      {showRightSidebar && (
+        <Sider
+          width={320}
+          style={{ background: '#fff', borderLeft: '1px solid #f0f0f0' }}
+        >
+          <SidebarRight />
+        </Sider>
+      )}
 
     </Layout>
   );

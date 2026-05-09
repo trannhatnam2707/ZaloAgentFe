@@ -46,6 +46,7 @@ const ChatList = () => {
                 dataSource={conversations}
                 renderItem={(item) => {
                     const isGroup = item?.type === 'group'
+                    const partnerId = item.members?.find(id => String(id) !== String(currentUser?.id));
                     let isActive = false
 
                     if (isGroup) {
@@ -53,12 +54,11 @@ const ChatList = () => {
                         // và có _id trùng khớp hoàn toàn.
                         isActive = selectedChat?.type === 'group' && String(selectedChat?.id) === String(item.id);
                     } else {
-                        // Đối với chat cá nhân: Tìm Partner ID
-                        const partnerId = item.members?.find(id => String(id) !== String(currentUser?.id));
-                        
-                        // CHỈ bôi đen nếu selectedChat KHÔNG PHẢI là group 
-                        // và có id (User ID) trùng khớp với partnerId.
-                        isActive = selectedChat?.type !== 'group' && String(selectedChat?.id) === String(partnerId);
+                        // Đối với chat cá nhân, selectedChat.id phải luôn là conversation id.
+                        // Dùng partnerId riêng chỉ để phục vụ UI/logic phụ.
+                        isActive =
+                            selectedChat?.type !== 'group' &&
+                            String(selectedChat?.id) === String(item.id);
                     }
 
                     return (
@@ -77,10 +77,9 @@ const ChatList = () => {
                                     console.log("Đang mở chat với nhóm có id:", item.id)
 
                                 } else {
-                                    // Lưu object cá nhân kèm partnerId vào trường 'id' để khớp tab Bạn bè
-                                    const partnerId = item.members?.find(id => String(id) !== String(currentUser?.id));
-                                    setSelectedChat({ ...item, id: partnerId });
-                                    console.log("Đang mở chat với user có id:", partnerId)
+                                    // Giữ nguyên conversation id, bổ sung partnerId để dùng khi cần.
+                                    setSelectedChat({ ...item, partnerId });
+                                    console.log("Đang mở chat 1-1, conversation id:", item.id, "partner id:", partnerId)
                                 }
                             }}
                         >

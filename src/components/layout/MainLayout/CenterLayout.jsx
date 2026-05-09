@@ -14,6 +14,18 @@ const CenterLayout = () => {
     const [errorMsg, setErrorMsg] = useState(null); // Quản lý lỗi truy cập
     const messagesEndRef = useRef(null);
 
+    const normalizeList = (payload, candidates = []) => {
+        if (Array.isArray(payload)) return payload;
+        if (!payload || typeof payload !== "object") return [];
+
+        for (const key of candidates) {
+            if (Array.isArray(payload[key])) return payload[key];
+        }
+
+        if (Array.isArray(payload.data)) return payload.data;
+        return [];
+    };
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -29,9 +41,15 @@ const CenterLayout = () => {
                 getMessageHistory(selectedChat.id),
                 getReportsByConversation(selectedChat.id)
             ]);
-            
-            setMessages(Array.isArray(msgData) ? msgData : []);
-            setReports(Array.isArray(reportData) ? reportData : []);
+
+            const normalizedMessages = normalizeList(msgData, ["messages", "items", "results"]);
+            const normalizedReports = normalizeList(reportData, ["reports", "items", "results"]);
+
+            setMessages(normalizedMessages);
+            setReports(normalizedReports);
+
+            console.log("message payload:", msgData);
+            console.log("report payload:", reportData);
         } catch (error) {
             console.error("Lỗi tải dữ liệu:", error);
             if (error.response?.status === 403) {
@@ -102,7 +120,7 @@ const CenterLayout = () => {
             {!errorMsg && (
                 <ChatInput 
                     conversationId={selectedChat.id} 
-                    onMessageSent={fetchData} 
+                    onRefresh={fetchData} 
                 />
             )}
         </div>
