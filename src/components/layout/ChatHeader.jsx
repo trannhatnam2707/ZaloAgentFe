@@ -3,10 +3,11 @@ import { useChat } from '../../context/ChatContext'
 import { Avatar, Button } from 'antd'
 import { InfoCircleFilled } from '@ant-design/icons'
 
-const ChatHeader = () => {
+const ChatHeader = ({ info }) => {
     const { headerInfo, showRightSidebar, setShowRightSidebar } = useChat()
+    const displayInfo = info || headerInfo
  
-    if(!headerInfo){
+    if(!displayInfo){
         return null
     }
     
@@ -22,15 +23,16 @@ const ChatHeader = () => {
             backgroundColor:'#4c8ae5'
         }}>
             <div style={{display:"flex", alignItems:"center", gap:'12px'}}>
-                <Avatar src={headerInfo.avatar || undefined} size={40} style={{border:"1px solid #f0f0f0"}}>
-                    {(headerInfo.title || headerInfo.name)?.charAt(0).toUpperCase()}
+                <Avatar src={displayInfo.avatar || undefined} size={40} style={{border:"1px solid #f0f0f0"}}>
+                    {(displayInfo.title || displayInfo.name)?.charAt(0).toUpperCase()
+                    }
                 </Avatar>
                 <div>
                     <div style={{ fontWeight:'600', fontSize: "16px", lineHeight:'1.2'}}>
-                        {headerInfo.title || headerInfo.name}
+                        {displayInfo.title || displayInfo.name}
                     </div>
                     <div style={{ fontSize: '12px', color: '#52c41a' }}>
-                        {headerInfo.type === 'group' ? 'Nhóm chat' : 'Đang hoạt động'}
+                        {displayInfo.type === 'group' ? 'Nhóm chat' : 'Đang hoạt động'}
                     </div>
                 </div>
                 <div style={{display:"flex", gap:'5px'}} >
