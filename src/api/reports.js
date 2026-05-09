@@ -2,11 +2,11 @@ import axiosClient from "./axios"
 
 
 export const createReports = async(reportData) => {
-    const res = await axiosClient.post("/reports", reportData)
+    const res = await axiosClient.post("/reports/", reportData)
     return res.data
 }
 export const getAllReports = async() => {
-    const res = await axiosClient.get("/reports")
+    const res = await axiosClient.get("/reports/")
     return res.data
 };
 

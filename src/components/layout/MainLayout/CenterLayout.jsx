@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useChat } from '../../../context/ChatContext'
 import { Spin } from 'antd'
 import { getAllReports } from '../../../api/reports'
@@ -11,22 +11,17 @@ import MessageItem from '../MessageItem'
 const CenterLayout = () => {
 
   const { selectedChat, setHeaderInfo } = useChat()
-  const [loading, setLoading] = useState(true)
   const [messages, setMessages] = useState([])
 
-  const fetchMessage = async () => {
-      if (!selectedChat) {
-        setMessages([])
-        setLoading(false)
-        return
-      }
+  const fetchMessage = useCallback( async () => {
+
+    const conversationId = selectedChat?._id || selectedChat?.id
+    if(!conversationId) return 
 
       try{
-        setLoading(true)
-
         const [resMessage, resReport] = await Promise.all([
-          getAllReports(),
-          getMessageHistory()
+          getAllReports(conversationId),
+          getMessageHistory(conversationId)
         ])
         console.log("getReport: ", resReport),
         console.log("getReport: ", resMessage)
@@ -47,10 +42,7 @@ const CenterLayout = () => {
       catch(err){
         console.error("Lỗi lấy dữ liệu: ", err)
       }
-      finally{
-        setLoading(false)
-      }
-  }
+  }, [selectedChat])
 
   useEffect(() => {
       if(selectedChat){
@@ -60,12 +52,11 @@ const CenterLayout = () => {
             type : selectedChat.type,
             id : selectedChat.id || selectedChat._id
          })
+        fetchMessage()
       }
   },[selectedChat])
 
-  useEffect(() => {
-    fetchMessage()
-  }, [selectedChat])
+
 
   return (
     <div style={{flex: 1, display: 'flex', flexDirection:"column", height: "100%"}}>
@@ -74,7 +65,7 @@ const CenterLayout = () => {
 
         {/* Message */}
         <div style={{flex:"1", overflowY:"auto", padding:"20px", backgroundColor:"#f5f5f5"}}>
-            {loading ? <Spin /> : messages.map((msg) => (
+            {messages.map((msg) => (
                 <MessageItem key={msg.id} message={msg}/>
             ))}
         </div>
