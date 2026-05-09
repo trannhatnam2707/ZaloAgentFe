@@ -1,82 +1,112 @@
-
-import React, { useCallback, useEffect, useState } from 'react'
-import { useChat } from '../../../context/ChatContext'
-import { Spin } from 'antd'
-import { getAllReports } from '../../../api/reports'
-import { getMessageHistory } from '../../../api/messages'
-import ChatHeader from '../ChatHeader'
-import ChatInput from '../ChatInput'
-import MessageItem from '../MessageItem'
+import React, { useState, useEffect, useRef } from "react";
+import ChatHeader from "../ChatHeader";
+import ChatInput from "../ChatInput";
+import MessageItem from "../MessageItem";
+import { useChat } from "../../../context/ChatContext";
+import { getMessageHistory } from "../../../api/messages";
+import { getReportsByConversation } from "../../../api/reports";
 
 const CenterLayout = () => {
+    const { selectedChat, headerInfo } = useChat();
+    const [messages, setMessages] = useState([]);
+    const [reports, setReports] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(null); // Quản lý lỗi truy cập
+    const messagesEndRef = useRef(null);
 
-  const { selectedChat, setHeaderInfo } = useChat()
-  const [messages, setMessages] = useState([])
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
 
-  const fetchMessage = useCallback( async () => {
+    const fetchData = async () => {
+        if (!selectedChat?.id) return;
+        
+        setLoading(true);
+        setErrorMsg(null);
+        try {
+            // Gọi song song để tối ưu
+            const [msgData, reportData] = await Promise.all([
+                getMessageHistory(selectedChat.id),
+                getReportsByConversation(selectedChat.id)
+            ]);
+            
+            setMessages(Array.isArray(msgData) ? msgData : []);
+            setReports(Array.isArray(reportData) ? reportData : []);
+        } catch (error) {
+            console.error("Lỗi tải dữ liệu:", error);
+            if (error.response?.status === 403) {
+                setErrorMsg("Bạn không có quyền xem cuộc hội thoại này.");
+            } else {
+                setErrorMsg("Đã xảy ra lỗi khi tải tin nhắn.");
+            }
+            setMessages([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    const conversationId = selectedChat?._id || selectedChat?.id
-    if(!conversationId) return 
+    useEffect(() => {
+        fetchData();
+    }, [selectedChat?.id]);
 
-      try{
-        const [resMessage, resReport] = await Promise.all([
-          getAllReports(conversationId),
-          getMessageHistory(conversationId)
-        ])
-        console.log("getReport: ", resReport),
-        console.log("getReport: ", resMessage)
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
-        // Gộp 2 mảng lại thành một
-        // Lưu ý: reportRes nên được đánh dấu type để MessageItem dễ phân biệt
-        const allData = [
-          ...(resMessage || []).map(m => ({ ...m, type: 'text', created_at: m.created_at })),
-          ...(resReport || []).map(r => ({ ...r, type: 'report_card', created_at: r.created_at }))
-        ];
+    // 1. Trường hợp chưa chọn hội thoại
+    if (!selectedChat) {
+        return (
+            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", background: "#f9fafb", color: "#9ca3af" }}>
+                <p>Hãy chọn một cuộc hội thoại để làm việc</p>
+            </div>
+        );
+    }
 
-        // Sắp xếp theo thời gian (từ cũ đến mới)
-        allData.sort((a,b) => new Date(a.created_at) - new Date(b.created_at))
+    return (
+        <div style={{ flex: 1, width: "100%", height: "100%", display: "flex", flexDirection: "column", background: "#fff", overflow: "hidden", position: "relative" }}>
+            {/* Header: Nếu headerInfo chưa có (null), hiện skeleton hoặc tên tạm */}
+            <ChatHeader info={headerInfo || { name: "Đang tải...", type: "loading" }} />
 
-        setMessages(allData)
-        console.log("logMessage: ",messages)
-      }
-      catch(err){
-        console.error("Lỗi lấy dữ liệu: ", err)
-      }
-  }, [selectedChat])
+            <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
+                {errorMsg ? (
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", color: "#ef4444" }}>
+                        <div style={{ background: "#fef2f2", padding: "16px", borderRadius: "8px", border: "1px solid #fecaca" }}>
+                            {errorMsg}
+                        </div>
+                    </div>
+                ) : loading && messages.length === 0 ? (
+                    <div style={{ display: "flex", justifyContent: "center", padding: "40px 0" }}>Đang tải tin nhắn...</div>
+                ) : (
+                    <>
+                        {/* Danh sách báo cáo nổi bật */}
+                        {reports.length > 0 && (
+                            <div style={{ background: "#fffbeb", padding: "12px", borderRadius: "6px", border: "1px solid #fde68a", color: "#92400e", fontSize: "12px", marginBottom: "8px" }}>
+                                📢 Hội thoại này có {reports.length} báo cáo công việc.
+                            </div>
+                        )}
 
-  useEffect(() => {
-      if(selectedChat){
-         setHeaderInfo({
-            title : selectedChat.conv_name || selectedChat.username,
-            avatar : selectedChat.avatar,
-            type : selectedChat.type,
-            id : selectedChat.id || selectedChat._id
-         })
-        fetchMessage()
-      }
-  },[selectedChat])
+                        {/* Danh sách tin nhắn */}
+                        {messages.length > 0 ? (
+                            messages.map((msg) => (
+                                <MessageItem key={msg._id || Math.random()} message={msg} />
+                            ))
+                        ) : (
+                            <div style={{ textAlign: "center", color: "#d1d5db", padding: "40px 0", fontStyle: "italic" }}>Chưa có tin nhắn nào</div>
+                        )}
+                        <div ref={messagesEndRef} />
+                    </>
+                )}
+            </div>
 
-
-
-  return (
-    <div style={{flex: 1, display: 'flex', flexDirection:"column", height: "100%"}}>
-        {/* Header */}
-        <ChatHeader/>
-
-        {/* Message */}
-        <div style={{flex:"1", overflowY:"auto", padding:"20px", backgroundColor:"#f5f5f5"}}>
-            {messages.map((msg) => (
-                <MessageItem key={msg.id} message={msg}/>
-            ))}
+            {/* Chỉ hiện Input nếu không bị lỗi quyền truy cập */}
+            {!errorMsg && (
+                <ChatInput 
+                    conversationId={selectedChat.id} 
+                    onMessageSent={fetchData} 
+                />
+            )}
         </div>
+    );
+};
 
-        {/* inputMessage */}
-        <div>
-        <ChatInput conversationId={selectedChat?._id || selectedChat?.id} onRefresh={fetchMessage} />
-        </div>
-
-    </div>
-  )
-}
-
-export default CenterLayout
+export default CenterLayout;
