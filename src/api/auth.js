@@ -46,14 +46,14 @@ export const getUserByUserName = async (username) => {
 
 export const searchUsers = async (keyword) => {
     // BE đang nhận Query Parameter (?keyword=...)
-    return await axiosClient.get(`/users/search`, { 
+    return await axiosClient.get(`/users/search/`, { 
         params: { keyword } 
     });
 };
 
 // Lấy danh sách bạn bè và lời mời kết bạn
 export const getFriendsList = async () => {
-    return await axiosClient.get("/users/friends/list");
+    return await axiosClient.get("/users/friends/list/");
 };
 
 // Gửi lời mời kết bạn
