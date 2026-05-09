@@ -7,6 +7,7 @@ export const ChatProvider = ({ children }) => {
     const { user } = useAuth();
     const [selectedChat, setSelectedChat] = useState(null);
     const [headerInfo, setHeaderInfo] = useState(null);
+    const [showRightSidebar, setShowRightSidebar] = useState(true);
 
     useEffect(() => {
         // Nếu chưa chọn chat hoặc chưa có user thì set null và thoát sớm
@@ -46,7 +47,9 @@ export const ChatProvider = ({ children }) => {
             selectedChat, 
             setSelectedChat, 
             headerInfo,
-            setHeaderInfo 
+            setHeaderInfo,
+            showRightSidebar,
+            setShowRightSidebar
         }}>
             {children}
         </ChatContext.Provider>
